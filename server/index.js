@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 
 const port = process.env.PORT || 3000
@@ -33,7 +33,11 @@ const verifyToken = async (req, res, next) => {
     next()
   })
 }
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@ema-john.ftku5dr.mongodb.net/?retryWrites=true&w=majority&appName=ema-john`;
+
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@urmi-project.bsifax9.mongodb.net/?retryWrites=true&w=majority&appName=urmi-project`;
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@ema-john.ftku5dr.mongodb.net/?retryWrites=true&w=majority&appName=ema-john`;
+
+
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -43,6 +47,9 @@ const client = new MongoClient(uri, {
   },
 })
 async function run() {
+  const plantsCollection =client.db('plantDB').collection('plants')
+
+
   try {
     // Generate jwt token
     app.post('/jwt', async (req, res) => {
@@ -73,6 +80,26 @@ async function run() {
       }
     })
 
+    app.post('/add-plant',async(req,res)=>{
+      const id = req.body
+      // console.log(id)
+      const result = await plantsCollection.insertOne(id)
+      res.send(result)
+
+    })
+    app.get('/plants',async(req,res)=>{
+      const result = await plantsCollection.find().toArray()
+      res.send(result)
+    })
+
+    app.get('/plant/:id', async (req, res) => {
+      const id = req.params.id
+      const result = await plantsCollection.findOne({
+        _id: new ObjectId(id),
+      })
+      res.send(result)
+    })
+
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 })
     console.log(
@@ -91,3 +118,4 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`plantNet is running on port ${port}`)
 })
+

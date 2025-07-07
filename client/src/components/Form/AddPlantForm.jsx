@@ -1,7 +1,9 @@
-const AddPlantForm = () => {
+const AddPlantForm = ({handleFormSubmit,isUploading
+     ,uploadedImage,handleImage,imageUploadError
+}) => {
   return (
     <div className='w-full min-h-[calc(100vh-40px)] flex flex-col justify-center items-center text-gray-800 rounded-xl bg-gray-50'>
-      <form>
+      <form onSubmit={handleFormSubmit}>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-10'>
           <div className='space-y-6'>
             {/* Name */}
@@ -84,9 +86,10 @@ const AddPlantForm = () => {
             {/* Image */}
             <div className=' p-4  w-full  m-auto rounded-lg flex-grow'>
               <div className='file_upload px-5 py-3 relative border-4 border-dotted border-gray-300 rounded-lg'>
-                <div className='flex flex-col w-max mx-auto text-center'>
+                <div className='flex items-center gap-2 w-max mx-auto text-center'>
                   <label>
                     <input
+                    onChange={handleImage}
                       className='text-sm cursor-pointer w-36 hidden'
                       type='file'
                       name='image'
@@ -98,7 +101,19 @@ const AddPlantForm = () => {
                       Upload
                     </div>
                   </label>
+                  
+                       {uploadedImage && 
+                       <div className="w-full">
+                         <img className="h-[150px] w-[180px]" src={uploadedImage} alt="plant-image"/>
+                       </div>
+                       }
+                       {
+                        imageUploadError && <p>{imageUploadError}</p>
+                       }
                 </div>
+
+
+
               </div>
             </div>
 
@@ -107,7 +122,7 @@ const AddPlantForm = () => {
               type='submit'
               className='w-full p-3 mt-5 text-center font-medium text-white transition duration-200 rounded shadow-md bg-lime-500 '
             >
-              Save & Continue
+               {isUploading ? 'Saving...' : 'Save' }
             </button>
           </div>
         </div>
