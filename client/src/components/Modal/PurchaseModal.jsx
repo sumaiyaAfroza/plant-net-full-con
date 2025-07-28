@@ -1,8 +1,62 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
+import useAuth from '../../hooks/useAuth';
+import toast from 'react-hot-toast';
+import { useState } from 'react';
+import {Elements} from '@stripe/react-stripe-js'
+import CheckOutForm from '../Form/CheckOutForm';
+import { loadStripe } from '@stripe/stripe-js';
 
-const PurchaseModal = ({ closeModal, isOpen }) => {
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+
+
+
+const PurchaseModal = ({ closeModal, isOpen ,plant}) => {
+  // console.log(plant);
   // Total Price Calculation
+  
+ const {user} = useAuth()
+ const { name, category, quantity, price, _id, seller, image } =  plant || {}
+ const [selectedQuantity, setSelectedQuantity] =  useState(1)
+ const [totalPrice, setTotalPrice] = useState(price)
+ const [orderData, setOrderData] = useState({
+  customer: {
+    name: user?.displayName,
+    email: user?.email,
+    image: user?.photoURL
+  },
+  seller,
+  plantId: _id,
+  quantity: 1,
+  price: price,
+  plantName: name,
+  plantCategory: category,
+  plantImage: image 
+ }) 
 
+ const handleQuantity = value =>{
+  // console.log(typeof value);
+  const totalQuantity = parseInt(value)
+  if(totalQuantity > quantity){
+    return toast.error('you cannot purchase')
+  }
+  const calculation = totalQuantity * price
+  setSelectedQuantity(totalQuantity)
+  setTotalPrice(calculation)
+  // setOrderData({
+  //   ...orderData,
+  //     price: calculation, quantity: totalQuantity
+  // })
+  setOrderData((prev)=>{
+    return {...prev, price: calculation, quantity: totalQuantity}
+  })
+  //  console.log(orderData);
+ }
+
+//  const handleOrder = ()=>{
+//   console.log(orderData);
+//    }
+  
   return (
     <Dialog
       open={isOpen}
@@ -23,26 +77,54 @@ const PurchaseModal = ({ closeModal, isOpen }) => {
               Review Info Before Purchase
             </DialogTitle>
             <div className='mt-2'>
-              <p className='text-sm text-gray-500'>Plant: Money Plant</p>
+              <p className='text-sm text-gray-500'>Plant: {name}</p>
             </div>
             <div className='mt-2'>
-              <p className='text-sm text-gray-500'>Category: Indoor</p>
+              <p className='text-sm text-gray-500'>Category: {category}</p>
             </div>
             <div className='mt-2'>
-              <p className='text-sm text-gray-500'>Customer: PH</p>
+              <p className='text-sm text-gray-500'>Customer: {user?.displayName}</p>
             </div>
 
             <div className='mt-2'>
-              <p className='text-sm text-gray-500'>Price: $ 120</p>
+              <p className='text-sm text-gray-500'>Price: {price}</p>
             </div>
             <div className='mt-2'>
-              <p className='text-sm text-gray-500'>Available Quantity: 5</p>
+              <p className='text-sm text-gray-500'>Available Quantity: {quantity}</p>
             </div>
+
+            <hr className='mt-6' />
+            <p>OrderInfo:</p>
+            <input
+            value={selectedQuantity} 
+            onChange={(e) => handleQuantity(e.target.value)} 
+            className=' border px-4' 
+            type="number" 
+            min={1}/>
+            <div>
+            <p>selected Quantity: {selectedQuantity} </p>
+          </div>
+          <div>
+            <p>total Price : {totalPrice} </p>
+          </div>
+
+          <Elements stripe={stripePromise}>
+            <CheckOutForm closeModal={closeModal} totalPrice={totalPrice} orderData={orderData}>
+
+            </CheckOutForm>
+          </Elements>
+         
+
+
           </DialogPanel>
+          
         </div>
+        
       </div>
     </Dialog>
   )
 }
 
 export default PurchaseModal
+
+
