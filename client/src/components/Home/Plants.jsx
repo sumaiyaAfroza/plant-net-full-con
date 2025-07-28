@@ -4,7 +4,7 @@ import { useLoaderData } from 'react-router'
 
 const Plants = () => {
   const plantsData = useLoaderData()
-  // console.log(plantsData)
+  console.log(plantsData)
   return (
    <Container>
       {plantsData && plantsData.length > 0 ? (

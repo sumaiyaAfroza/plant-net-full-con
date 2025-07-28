@@ -61,9 +61,11 @@ const client = new MongoClient(uri, {
 async function run() {
   const plantsCollection =client.db('plantDB').collection('plants')
   const orderCollection =client.db('plantDB').collection('orders')
+  const usersCollection =client.db('plantDB').collection('users')
 
 
   try {
+
     // Generate jwt token
     app.post('/jwt', async (req, res) => {
       const email = req.body
@@ -134,10 +136,62 @@ async function run() {
       res.send({clientSecret: client_secret})
     })
 
+//  quantity
+    app.patch('/quantity-update/:id',async(req,res)=>{
+      const id = req.params.id
+      const {quantityToUpdate, status} = req.body 
+      // console.log(quantityToUpdate, status);
+      const filter = {_id: new ObjectId(id)}
+      const updateDoc = {
+        $inc:{
+          quantity: status === 'increase' ? quantityToUpdate: -quantityToUpdate
+        }
+      }
+      const result = await plantsCollection.updateOne(filter, updateDoc)
+      res.send(result)
+    })
+
+
 app.post('/orders',async(req,res)=>{
   const data = req.body
   const result = await orderCollection.insertOne(data)
   res.send(result) 
+})
+
+
+// user er data 
+app.post('/users',async(req,res)=>{
+  const userInfo = req.body
+  userInfo.role = 'customer',
+  userInfo.create_At = new Date().toISOString()
+  userInfo.last_login = new Date().toISOString()
+  const query = {
+    email: userInfo?.email
+  }
+
+  const alreadyExists = await usersCollection.findOne(query)
+  // console.log(alreadyExists);
+  // console.log(!!alreadyExists);
+
+  // jodi email take taile last_login update hobe .
+  if(!!alreadyExists){
+    const result = await usersCollection.updateOne(query,{
+       $set:{ last_login : new Date().toISOString()}
+    })
+    return res.send(result)
+  }
+
+  const result = await usersCollection.insertOne(userInfo)
+  res.send(result)
+})
+
+//  role onujai user neoa email diye
+app.get('/users/role/:email',async(req,res)=>{
+  const email = req.params.email
+  const result = await usersCollection.findOne({email})
+   
+  if(!result) return res.status(404).send({message: 'user not found'})
+    res.send({role: result?.role})
 })
 
 

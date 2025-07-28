@@ -4,9 +4,10 @@ import {HashLoader} from 'react-spinners'
 import './common.css';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 import useAuth from '../../hooks/useAuth';
+import toast from 'react-hot-toast';
 
 const CheckOutForm = ({totalPrice,closeModal,orderData}) => {
-// console.log(orderData);
+console.log(orderData);
 
     const stripe = useStripe()
     const elements = useElements()
@@ -23,7 +24,7 @@ const CheckOutForm = ({totalPrice,closeModal,orderData}) => {
                 quantity: orderData?.quantity,
                 plantId: orderData?.plantId
             })
-            // console.log(data);
+            console.log(data);
             setClientSecret(data?.clientSecret)
 
         }
@@ -90,7 +91,17 @@ const CheckOutForm = ({totalPrice,closeModal,orderData}) => {
         //   console.log(orderData.transactionId);
 
         try {
-            await axiosSecure.post('/orders',orderData)
+          const {data} =  await axiosSecure.post('/orders',orderData)
+        //   console.log(data);
+        if(data?.insertedId){
+            toast.success('order placed successfully')
+        }
+        const {data: result} = await axiosSecure.patch(`/quantity-update/${orderData?.plantId}`,{
+            quantityToUpdate: orderData?.quantity,
+            status: 'decrease'
+        })
+        console.log(result);
+
             
         } catch (error) {
             console.log(error);
@@ -101,11 +112,6 @@ const CheckOutForm = ({totalPrice,closeModal,orderData}) => {
             closeModal()
         }
         }
-
-
-
-
-
       };
 
 

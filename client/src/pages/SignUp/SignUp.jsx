@@ -4,6 +4,7 @@ import useAuth from '../../hooks/useAuth'
 import { toast } from 'react-hot-toast'
 import { TbFidgetSpinner } from 'react-icons/tb'
 import imageUpload from '../../imageUpload'
+import { userId } from '../../utils'
 
 const SignUp = () => {
   const { createUser, updateUserProfile, signInWithGoogle, loading } = useAuth()
@@ -29,6 +30,14 @@ const SignUp = () => {
       )
       console.log(result)
 
+      const userInfo ={
+        name,
+        email,
+        image : imageUrl
+      }
+
+      await userId(userInfo)
+
       navigate('/')
       toast.success('Signup Successful')
     } catch (err) {
@@ -41,7 +50,17 @@ const SignUp = () => {
   const handleGoogleSignIn = async () => {
     try {
       //User Registration using google
-      await signInWithGoogle()
+    const result =  await signInWithGoogle()
+
+    const userInfo ={
+      name: result?.user?.name,
+      email: result?.user?.email,
+      image :result?.user?.imageUrl
+    }
+
+    await userId(userInfo)
+
+
 
       navigate('/')
       toast.success('Signup Successful')
