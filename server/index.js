@@ -117,11 +117,13 @@ async function run() {
 
     app.post('/create-payment-intent', async(req,res)=>{
       const {plantId, quantity} = req.body;
-      //  console.log(plantId, quantity);
+       console.log(plantId, quantity);
 
       const plant = await plantsCollection.findOne({
         _id: new ObjectId(plantId)
       })
+      // console.log(plant);
+
       if(!plant) return res.status(404).send({message: 'plant not found'})
       const  totalPrice = quantity * plant?.price * 100    /** aikhane 1 cent e 100 hoi, payment cent korte hoi tai 100 gun dise */
         

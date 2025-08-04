@@ -6,7 +6,7 @@ import useAxiosSecure from '../../hooks/useAxiosSecure';
 import useAuth from '../../hooks/useAuth';
 import toast from 'react-hot-toast';
 
-const CheckOutForm = ({totalPrice,closeModal,orderData}) => {
+const CheckOutForm = ({totalPrice,closeModal,orderData,refetch}) => {
 console.log(orderData);
 
     const stripe = useStripe()
@@ -26,11 +26,8 @@ console.log(orderData);
             })
             console.log(data);
             setClientSecret(data?.clientSecret)
-
         }
-
         paymentIntent()
-
     },[axiosSecure,orderData])
 
 
@@ -101,7 +98,7 @@ console.log(orderData);
             status: 'decrease'
         })
         console.log(result);
-
+        refetch()
             
         } catch (error) {
             console.log(error);

@@ -2,21 +2,31 @@ import Container from '../../components/Shared/Container'
 import Heading from '../../components/Shared/Heading'
 import Button from '../../components/Shared/Button/Button'
 import PurchaseModal from '../../components/Modal/PurchaseModal'
-import { useState } from 'react'
-import { useLoaderData } from 'react-router'
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router'
 import useAuth from '../../hooks/useAuth'
 import useRole from '../../hooks/useRole'
+import axios from 'axios'
+import { useQuery } from '@tanstack/react-query'
+import LoadingSpinner from '../../components/Shared/LoadingSpinner'
 
 
 const PlantDetails = () => {
-  const plant = useLoaderData()
+  // const plant = useLoaderData()
+  const {id }= useParams()
   const {user} = useAuth()
+  // const [plant, setPlant] = useState({});
   const [role, isRoleLoading] = useRole()
-
-  
   const [isOpen, setIsOpen] = useState(false)
   // console.log(plant)
 
+  const {data:plant, isLoading, refetch} = useQuery({
+    queryKey: ['plant', id],
+    queryFn:  async () =>{
+          const {data} = await axios.get(`${import.meta.env.VITE_API_URL}/plant/${id}`)
+          return data
+    }
+  })
   // if (!plant || typeof plant !== 'object') return <p>Sorry bro</p>
   const { name, description, category, quantity, price, _id, seller, image } =
     plant || {}
@@ -27,7 +37,18 @@ const PlantDetails = () => {
     setIsOpen(false)
   }
 
-  // if(isRoleLoading) return Loadin
+
+
+
+//   const fetchPlant = async () =>{
+//     const {data} = await axios.get(`${import.meta.env.VITE_API_URL}/plant/${id}`)
+//     setPlant(data)
+//   }
+//   useEffect(() => {
+//     fetchPlant()
+//  }, [id]);
+
+  if(isRoleLoading  || isLoading) return <LoadingSpinner></LoadingSpinner>
 
   return (
     <Container>
@@ -98,7 +119,7 @@ const PlantDetails = () => {
           </div>
           <hr className='my-6' />
 
-          <PurchaseModal plant={plant} closeModal={closeModal} isOpen={isOpen} />
+          <PurchaseModal refetch={refetch}  plant={plant} closeModal={closeModal} isOpen={isOpen} />
         </div>
       </div>
     </Container>

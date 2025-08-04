@@ -1,7 +1,7 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import useAuth from '../../hooks/useAuth';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {Elements} from '@stripe/react-stripe-js'
 import CheckOutForm from '../Form/CheckOutForm';
 import { loadStripe } from '@stripe/stripe-js';
@@ -11,12 +11,15 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
 
 
 
-const PurchaseModal = ({ closeModal, isOpen ,plant}) => {
+const PurchaseModal = ({ closeModal, isOpen ,plant,refetch}) => {
   // console.log(plant);
   // Total Price Calculation
   
  const {user} = useAuth()
  const { name, category, quantity, price, _id, seller, image } =  plant || {}
+ 
+//  console.log(plant);
+
  const [selectedQuantity, setSelectedQuantity] =  useState(1)
  const [totalPrice, setTotalPrice] = useState(price)
  const [orderData, setOrderData] = useState({
@@ -34,6 +37,27 @@ const PurchaseModal = ({ closeModal, isOpen ,plant}) => {
   plantImage: image 
  }) 
 
+ useEffect(() => {
+  if (plant && user) {
+    setOrderData({
+      customer: {
+        name: user.displayName,
+        email: user.email,
+        image: user.photoURL
+      },
+      seller: plant.seller,
+      plantId: plant._id,
+      quantity: 1,
+      price: plant.price,
+      plantName: plant.name,
+      plantCategory: plant.category,
+      plantImage: plant.image
+    })
+  }
+}, [plant, user])
+
+ console.log(orderData);
+
  const handleQuantity = value =>{
   // console.log(typeof value);
   const totalQuantity = parseInt(value)
@@ -43,15 +67,23 @@ const PurchaseModal = ({ closeModal, isOpen ,plant}) => {
   const calculation = totalQuantity * price
   setSelectedQuantity(totalQuantity)
   setTotalPrice(calculation)
-  // setOrderData({
-  //   ...orderData,
-  //     price: calculation, quantity: totalQuantity
-  // })
-  setOrderData((prev)=>{
-    return {...prev, price: calculation, quantity: totalQuantity}
-  })
+
+  setOrderData(prev => ({
+    ...prev,
+    price: calculation, quantity: totalQuantity
+  }))
+
+
+  setOrderData(prev => ({
+    ...prev,
+    price: calculation,
+    quantity: totalQuantity
+  }))
   //  console.log(orderData);
  }
+
+
+// ==========================
 
 //  const handleOrder = ()=>{
 //   console.log(orderData);
@@ -109,7 +141,7 @@ const PurchaseModal = ({ closeModal, isOpen ,plant}) => {
           </div>
 
           <Elements stripe={stripePromise}>
-            <CheckOutForm closeModal={closeModal} totalPrice={totalPrice} orderData={orderData}>
+            <CheckOutForm refetch={refetch} closeModal={closeModal} totalPrice={totalPrice} orderData={orderData}>
 
             </CheckOutForm>
           </Elements>
