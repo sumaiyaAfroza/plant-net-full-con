@@ -1,6 +1,21 @@
 import UserDataRow from '../../../components/Dashboard/TableRows/UserDataRow'
+import {useQuery} from "@tanstack/react-query";
+import useAxiosSecure from "../../../hooks/useAxiosSecure.jsx";
 
 const ManageUsers = () => {
+    const axiosSecure = useAxiosSecure()
+
+    const {data: allUser, isLoading} = useQuery({
+         queryKey:['user'],
+        queryFn: async () => {
+             const {data} = await axiosSecure.get('/all-user')
+            return data
+
+        }
+    })
+
+
+
   return (
     <>
       <div className='container mx-auto px-4 sm:px-8'>
@@ -38,7 +53,9 @@ const ManageUsers = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <UserDataRow />
+                {allUser.map(user =>
+                  <UserDataRow key={user._id} user={user} />
+                )}
                 </tbody>
               </table>
             </div>

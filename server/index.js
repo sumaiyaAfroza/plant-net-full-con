@@ -102,6 +102,7 @@ async function run() {
       res.send(result)
 
     })
+
     app.get('/plants',async(req,res)=>{
       const result = await plantsCollection.find().toArray()
       res.send(result)
@@ -186,6 +187,14 @@ app.post('/users',async(req,res)=>{
   const result = await usersCollection.insertOne(userInfo)
   res.send(result)
 })
+
+app.get('/all-user', async (req,res)=>{
+    const result = await usersCollection.find().toArray()
+    res.send(result)
+})
+      
+
+
 
 //  role onujai user neoa email diye
 app.get('/users/role/:email',async(req,res)=>{
