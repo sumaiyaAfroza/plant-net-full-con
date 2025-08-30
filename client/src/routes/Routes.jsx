@@ -14,6 +14,8 @@ import MainLayout from '../layouts/MainLayout'
 import MyInventory from '../pages/Dashboard/Seller/MyInventory'
 import ManageOrders from '../pages/Dashboard/Seller/ManageOrders'
 import MyOrders from '../pages/Dashboard/Customer/MyOrders'
+import SellerRoute from "./SellerRoute.jsx";
+import AdminRoute from "./AdminRoute.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -52,11 +54,15 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+
+      //   seller Route
       {
         path: 'add-plant',
         element: (
           <PrivateRoute>
-            <AddPlant />
+              <SellerRoute>
+                  <AddPlant />
+              </SellerRoute>
           </PrivateRoute>
         ),
       },
@@ -64,15 +70,20 @@ export const router = createBrowserRouter([
         path: 'my-inventory',
         element: (
           <PrivateRoute>
-            <MyInventory />
+          <SellerRoute>
+              <MyInventory />
+          </SellerRoute>
           </PrivateRoute>
         ),
       },
+      //   admin route
       {
         path: 'manage-users',
         element: (
           <PrivateRoute>
-            <ManageUsers />
+            <AdminRoute>
+                <ManageUsers />
+            </AdminRoute>
           </PrivateRoute>
         ),
       },
@@ -94,7 +105,12 @@ export const router = createBrowserRouter([
       },
       {
         path: 'manage-orders',
-        element: <ManageOrders />,
+        element:
+        <PrivateRoute>
+            <SellerRoute>
+                <ManageOrders />,
+            </SellerRoute>
+        </PrivateRoute>
       },
     ],
   },
