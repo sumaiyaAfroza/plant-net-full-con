@@ -4,11 +4,11 @@ import LoadingSpinner from "../components/Shared/LoadingSpinner.jsx";
 import {Navigate} from "react-router";
 
 const SellerRoute = ({children}) => {
-    const {role, isRoleLoading} = useRole()
+    const [role, isRoleLoading] = useRole()
     if (isRoleLoading) return <LoadingSpinner />
     if (role === "seller") return children
-    return <Navigate to='/login' replace='true' />
-}
+    return <Navigate to='/' replace='true' />
+
 };
 
 export default SellerRoute;
