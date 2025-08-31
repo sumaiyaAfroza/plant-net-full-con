@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import express from 'express'
+import express, {request} from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { MongoClient, ServerApiVersion, ObjectId } from 'mongodb'
@@ -155,7 +155,7 @@ async function run() {
     })
 
 
-app.post('/orders',async(req,res)=>{
+  app.post('/orders',async(req,res)=>{
   const data = req.body
   const result = await orderCollection.insertOne(data)
   res.send(result) 
@@ -200,10 +200,14 @@ app.get('/all-user', verifyToken, async (req,res)=>{
     const result = await usersCollection.find(filter).toArray()
     res.send(result)
 })
-      
 
+app.patch('/users/role/update/:email', async (req, res) => {
+  const email = req.params.email
+  const {role} = req.body
+  console.log(role)
+})
 
-
+	  
 //  role onujai user neoa email diye
 app.get('/users/role/:email',async(req,res)=>{
   const email = req.params.email

@@ -26,7 +26,7 @@ const UserDataRow = ({user}) => {
           <span className='relative'>Update Role</span>
         </span>
         {/* Modal */}
-        <UpdateUserRoleModal isOpen={isOpen} setIsOpen={setIsOpen} />
+        <UpdateUserRoleModal isOpen={isOpen} setIsOpen={setIsOpen} email={email} role={role} />
       </td>
     </tr>
   )

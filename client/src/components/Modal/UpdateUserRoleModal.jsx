@@ -1,13 +1,26 @@
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
+import useAxiosSecure from "../../hooks/useAxiosSecure.jsx";
+import {useMutation} from "@tanstack/react-query";
+import {useState} from "react";
 
-export default function UpdateUserRoleModal({isOpen,setIsOpen}) {
+export default function UpdateUserRoleModal({isOpen,setIsOpen, email,role}) {
+  const axiosSecure = useAxiosSecure()
+  const [updateRole, setUpdateRole] = useState(role)
 
 	function close() {
 		setIsOpen(false)
 	}
 
+  const mutation = useMutation({
+    mutationFn: async role => {
+      const {data} = await axiosSecure.patch(`/users/role/update/${email}`, { role })
+      return data
+    }
+  })
+
 	const handleSubmit = (e) =>{
 		e.preventDefault()
+    mutation.mutate(updateRole)
 	}
 
 	return (
@@ -25,27 +38,34 @@ export default function UpdateUserRoleModal({isOpen,setIsOpen}) {
 							<form onSubmit={handleSubmit}>
 								<div>
 									<label className='font-semibold my-5'>select user</label>
-									<select className='border w-full mb-4'>
+									<select className='border w-full mb-4'
+                          onChange={(e)=> setUpdateRole(e.target.value)}
+                          value={updateRole}
+                  >
 										<option value='customer'>Customer</option>
 										<option value='admin'>Admin</option>
 										<option value='seller'>Seller</option>
 
 									</select>
 								</div>
+
+                <div className='flex justify-between ' >
+                  <Button
+                    className="inline-flex items-center rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700"
+                    onClick={close}
+                  >
+                    close
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="inline-flex items-center rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700"
+                  >
+                    update
+                  </Button>
+                </div>
+
 							</form>
-							<div className='flex justify-between ' >
-								<Button
-									className="inline-flex items-center rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700"
-									onClick={close}
-								>
-									close
-								</Button>
-								<Button
-									className="inline-flex items-center rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700"
-								>
-									update
-								</Button>
-							</div>
+
 						</DialogPanel>
 					</div>
 				</div>
