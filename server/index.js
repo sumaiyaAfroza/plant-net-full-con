@@ -183,13 +183,21 @@ app.post('/users',async(req,res)=>{
     })
     return res.send(result)
   }
-
   const result = await usersCollection.insertOne(userInfo)
   res.send(result)
 })
 
-app.get('/all-user', async (req,res)=>{
-    const result = await usersCollection.find().toArray()
+
+
+// 	  manage users er sob user gula
+app.get('/all-user', verifyToken, async (req,res)=>{
+
+	const filter = {
+		email: {
+			$ne: req?.user?.email   /* kono kisu bad dite caite ai $ne operator use kore */
+		}
+	}
+    const result = await usersCollection.find(filter).toArray()
     res.send(result)
 })
       

@@ -1,4 +1,9 @@
+import {useState} from "react";
+import UpdateUserRoleModal from "../../Modal/UpdateUserRoleModal.jsx";
+
 const UserDataRow = ({user}) => {
+	const [isOpen, setIsOpen] = useState(false)
+
     const {email, role} = user
   return (
     <tr>
@@ -13,7 +18,7 @@ const UserDataRow = ({user}) => {
       </td>
 
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
-        <span className='relative cursor-pointer inline-block px-3 py-1 font-semibold text-green-900 leading-tight'>
+        <span onClick={()=> setIsOpen(true)} className='relative cursor-pointer inline-block px-3 py-1 font-semibold text-green-900 leading-tight'>
           <span
             aria-hidden='true'
             className='absolute inset-0 bg-green-200 opacity-50 rounded-full'
@@ -21,7 +26,7 @@ const UserDataRow = ({user}) => {
           <span className='relative'>Update Role</span>
         </span>
         {/* Modal */}
-        {/* <UpdateUserModal /> */}
+        <UpdateUserRoleModal isOpen={isOpen} setIsOpen={setIsOpen} />
       </td>
     </tr>
   )
