@@ -204,7 +204,33 @@ app.get('/all-user', verifyToken, async (req,res)=>{
 app.patch('/users/role/update/:email', async (req, res) => {
   const email = req.params.email
   const {role} = req.body
-  console.log(role)
+  // console.log(role)
+  const filter = {
+    email : email
+  }
+  const update = {
+    $set: {
+      role,
+      status: 'verified'
+    }
+  }
+  const result = await usersCollection.updateOne(filter,update)
+  res.send(result)
+})
+
+ app.patch('/become-seller-request/:email', async (req, res) => {
+  const email = req.params.email
+  // console.log(role)
+  const filter = {
+    email : email
+  }
+  const update = {
+    $set: {
+      status: 'requested'
+    }
+  }
+  const result = await usersCollection.updateOne(filter,update)
+  res.send(result)
 })
 
 	  

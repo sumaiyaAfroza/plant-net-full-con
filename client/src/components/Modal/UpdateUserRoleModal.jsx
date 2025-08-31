@@ -1,11 +1,13 @@
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import useAxiosSecure from "../../hooks/useAxiosSecure.jsx";
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {useState} from "react";
+import toast from "react-hot-toast";
 
 export default function UpdateUserRoleModal({isOpen,setIsOpen, email,role}) {
   const axiosSecure = useAxiosSecure()
   const [updateRole, setUpdateRole] = useState(role)
+  const queryClient = useQueryClient()
 
 	function close() {
 		setIsOpen(false)
@@ -15,9 +17,17 @@ export default function UpdateUserRoleModal({isOpen,setIsOpen, email,role}) {
     mutationFn: async role => {
       const {data} = await axiosSecure.patch(`/users/role/update/${email}`, { role })
       return data
+    },
+    onSuccess: () => {
+      toast.success('user role update')
+      close()
+      queryClient.invalidateQueries(['user'])   /*  ['user'] ta queryKey=['user']= aita crash hoye take get er data gula tai invalidateQueries kore crash bondo kore, patch ta jeno reload diye UI update korte na hoi aijonno aita kora */
+    },
+    onError: (error)=>{
+      console.log(error)
     }
-  })
 
+  })
 	const handleSubmit = (e) =>{
 		e.preventDefault()
     mutation.mutate(updateRole)
@@ -45,10 +55,8 @@ export default function UpdateUserRoleModal({isOpen,setIsOpen, email,role}) {
 										<option value='customer'>Customer</option>
 										<option value='admin'>Admin</option>
 										<option value='seller'>Seller</option>
-
 									</select>
 								</div>
-
                 <div className='flex justify-between ' >
                   <Button
                     className="inline-flex items-center rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-600 data-open:bg-gray-700"
@@ -63,9 +71,7 @@ export default function UpdateUserRoleModal({isOpen,setIsOpen, email,role}) {
                     update
                   </Button>
                 </div>
-
 							</form>
-
 						</DialogPanel>
 					</div>
 				</div>
