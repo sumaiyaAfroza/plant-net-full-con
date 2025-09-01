@@ -188,7 +188,6 @@ app.post('/users',async(req,res)=>{
 })
 
 
-
 // 	  manage users er sob user gula
 app.get('/all-user', verifyToken, async (req,res)=>{
 
@@ -237,7 +236,39 @@ app.patch('/users/role/update/:email', async (req, res) => {
       const totalUser = await usersCollection.estimatedDocumentCount()
       const totalPlant = await plantsCollection.estimatedDocumentCount()
       const totalOrder = await orderCollection.estimatedDocumentCount()
-      res.send({totalUser,totalPlant, totalOrder})
+      const pipeline = [
+        {
+          $addFields: {
+            create_At: {
+              $toDate: '$_id'
+            }
+          }
+        },
+        {
+          $group: {
+            _id : {
+              $dateToString: {
+                format: '%d-%m-%Y',
+                date: '$create_At'
+              }
+            },
+            revenue:{
+              $sum: '$price'
+            },
+            order:{
+              $sum: 1
+            }
+          }
+        }
+
+      ]
+      const result = await orderCollection.aggregate(pipeline).toArray()
+      const barChartData = result.map(data => (
+        {data: data._id, revenue: data.revenue , order: data.order}
+      ))
+      const totalRevenue = result.reduce((sum,data)=> sum + data ?.revenue, 0)
+
+        res.send({barChartData,totalUser,totalPlant, totalOrder})
 
     })
 	  
