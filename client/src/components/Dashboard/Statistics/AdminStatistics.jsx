@@ -2,6 +2,7 @@ import { FaUserAlt, FaDollarSign } from 'react-icons/fa'
 import { BsFillCartPlusFill, BsFillHouseDoorFill } from 'react-icons/bs'
 import useAxiosSecure from "../../../hooks/useAxiosSecure.jsx";
 import {useQuery} from "@tanstack/react-query";
+import LoadingSpinner from "../../Shared/LoadingSpinner.jsx";
 
 const AdminStatistics = () => {
   const axiosSecure = useAxiosSecure()
@@ -13,6 +14,8 @@ const AdminStatistics = () => {
     }
   })
   console.log(stats)
+
+  if(isLoading) return <LoadingSpinner></LoadingSpinner>
 
   return (
     <div>
@@ -47,7 +50,7 @@ const AdminStatistics = () => {
                 Total Orders
               </p>
               <h4 className='block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900'>
-                120
+                {stats.totalOrder}
               </h4>
             </div>
           </div>
@@ -63,7 +66,7 @@ const AdminStatistics = () => {
                 Total Plants
               </p>
               <h4 className='block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900'>
-                120
+                {stats.totalPlant}
               </h4>
             </div>
           </div>
@@ -79,7 +82,7 @@ const AdminStatistics = () => {
                 Total User
               </p>
               <h4 className='block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900'>
-                10
+                {stats.totalUser}
               </h4>
             </div>
           </div>
