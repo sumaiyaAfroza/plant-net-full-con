@@ -233,6 +233,13 @@ app.patch('/users/role/update/:email', async (req, res) => {
   res.send(result)
 })
 
+    app.get('/admin-stats', async (req, res) =>{
+      const totalUser = await usersCollection.estimatedDocumentCount()
+      const totalPlant = await plantsCollection.estimatedDocumentCount()
+      const totalOrder = await orderCollection.estimatedDocumentCount()
+      res.send({totalUser,totalPlant, totalOrder})
+
+    })
 	  
 //  role onujai user neoa email diye
 app.get('/users/role/:email',async(req,res)=>{
